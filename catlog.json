@@ -1,0 +1,82 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+
+// Convert character to corresponding digit
+int charToDigit(char c) {
+    if (c >= '0' && c <= '9') return c - '0';
+    if (c >= 'a' && c <= 'z') return 10 + (c - 'a');
+    if (c >= 'A' && c <= 'Z') return 10 + (c - 'A');
+    return -1; // invalid character
+}
+
+// Convert a number from given base to decimal
+unsigned long long baseToDecimal(const char *val, int base) {
+    unsigned long long result = 0;
+    while (*val) {
+        int digit = charToDigit(*val++);
+        if (digit >= base) {
+            printf("Invalid digit for base %d\n", base);
+            return 0;
+        }
+        result = result * base + digit;
+    }
+    return result;
+}
+
+// Lagrange interpolation to compute f(0)
+double lagrangeInterpolation(int *x, double *y, int k) {
+    double result = 0;
+    for (int i = 0; i < k; ++i) {
+        double term = y[i];
+        for (int j = 0; j < k; ++j) {
+            if (j != i)
+                term *= (0.0 - x[j]) / (x[i] - x[j]);
+        }
+        result += term;
+    }
+    return result;
+}
+
+int main() {
+    // ---------- Sample for Test Case 1 ----------
+    int k1 = 3;
+    int x1[] = {1, 2, 3}; // x values from JSON keys
+    char *val1[] = {"4", "111", "12"};
+    int base1[] = {10, 2, 10};
+
+    double y1[3];
+    for (int i = 0; i < k1; ++i) {
+        y1[i] = (double) baseToDecimal(val1[i], base1[i]);
+    }
+
+    double c1 = lagrangeInterpolation(x1, y1, k1);
+
+    // ---------- Sample for Test Case 2 ----------
+    int k2 = 7;
+    int x2[] = {1, 2, 3, 4, 5, 6, 7}; // First 7 x-values
+    char *val2[] = {
+        "13444211440455345511", // base 6
+        "aed7015a346d63",       // base 15
+        "6aeeb69631c227c",      // base 15
+        "e1b5e05623d881f",      // base 16
+        "316034514573652620673",// base 8
+        "2122212201122002221120200210011020220200", // base 3
+        "20120221122211000100210021102001201112121" // base 3
+    };
+    int base2[] = {6, 15, 15, 16, 8, 3, 3};
+
+    double y2[7];
+    for (int i = 0; i < k2; ++i) {
+        y2[i] = (double) baseToDecimal(val2[i], base2[i]);
+    }
+
+    double c2 = lagrangeInterpolation(x2, y2, k2);
+
+    // Output final secrets (rounded)
+    printf("Secret from Test Case 1: %.0f\n", c1);
+    printf("Secret from Test Case 2: %.0f\n", c2);
+
+    return 0;
+}
